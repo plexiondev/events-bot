@@ -4,8 +4,9 @@ from discord.ext import commands
 from discord_slash import SlashCommand
 import random
 import csv
-activity = discord.Activity(type=discord.ActivityType.listening, name="Deezer")
-bot = commands.Bot(command_prefix="!", activity=activity)
+
+from discord_slash.utils.manage_commands import create_choice, create_option
+bot = commands.Bot(command_prefix="!")
 slash = SlashCommand(bot, sync_commands=True)
 bot.remove_command("help")
 
@@ -39,7 +40,73 @@ async def help(ctx): #Message indicating the switch to /slash commands
     )
     await ctx.send(embed = embed)
 
-@slash.slash(name="create", description="Announces a new event", guild_ids=guild_id)
+@slash.slash(
+    name="create",
+    description="Announces a new event",
+    guild_ids=guild_id,
+    options=[
+        create_option(
+            name="title",
+            description="Specify a title for your event",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="description",
+            description="Write a summary of your event, around 50-100 words",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="players",
+            description="Specify the maximum amount of players allowed",
+            option_type=4,
+            required=True
+        ),
+        create_option(
+            name="teams",
+            description="Specify the amount of teams there will be (or put Solos)",
+            option_type=4,
+            required=True
+        ),
+        create_option(
+            name="location",
+            description="Specify where the event will be hosted (eg. ip, realm etc.)",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="date",
+            description="What date and time will the event be hosted?",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="status",
+            description="Specify the current status of the event, can be edited later",
+            option_type=3,
+            required=True,
+            choices=[
+                create_choice(
+                    name="Ready to start",
+                    value="ready"
+                ),
+                create_choice(
+                    name="Waiting for players",
+                    value="waiting"
+                ),
+                create_choice(
+                    name="Developing and testing",
+                    value="progress"
+                ),
+                create_choice(
+                    name="Cancelled/Ended",
+                    value="ended"
+                )
+            ]
+        )
+    ]
+)
 async def create(ctx, title, description, players, teams, location, date, status): #Custom-defined embed
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
@@ -103,7 +170,79 @@ async def create(ctx, title, description, players, teams, location, date, status
         )
         await ctx.send(embed = embed, hidden=True)
 
-@slash.slash(name="edit", description="Edits an already existing event's information", guild_ids=guild_id)
+@slash.slash(
+    name="edit",
+    description="Edits an already existing event's information",
+    guild_ids=guild_id,
+    options=[
+        create_option(
+            name="title",
+            description="Specify a title for your event",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="description",
+            description="Write a summary of your event, around 50-100 words",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="players",
+            description="Specify the maximum amount of players allowed",
+            option_type=4,
+            required=True
+        ),
+        create_option(
+            name="teams",
+            description="Specify the amount of teams there will be (or put Solos)",
+            option_type=4,
+            required=True
+        ),
+        create_option(
+            name="location",
+            description="Specify where the event will be hosted (eg. ip, realm etc.)",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="date",
+            description="What date and time will the event be hosted?",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="status",
+            description="Specify the current status of the event",
+            option_type=3,
+            required=True,
+            choices=[
+                create_choice(
+                    name="Ready to start",
+                    value="ready"
+                ),
+                create_choice(
+                    name="Waiting for players",
+                    value="waiting"
+                ),
+                create_choice(
+                    name="Developing and testing",
+                    value="progress"
+                ),
+                create_choice(
+                    name="Cancelled/Ended",
+                    value="ended"
+                )
+            ]
+        ),
+        create_option(
+            name="message_id",
+            description="Provide the ID of the event message you want to edit",
+            option_type=3,
+            required=True
+        )
+    ]
+)
 async def edit(ctx, title, description, players, teams, location, date, status, id): #Set event status
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
@@ -159,7 +298,19 @@ async def edit(ctx, title, description, players, teams, location, date, status, 
         )
         await ctx.send(embed = embed, hidden=True)
 
-@slash.slash(name="announce", description="Pings an announcement for a new event", guild_ids=guild_id)
+@slash.slash(
+    name="announce",
+    description="Pings an announcement for a new event",
+    guild_ids=guild_id,
+    options=[
+        create_option(
+            name="title",
+            description="Specify the title of the event you want to announce",
+            option_type=3,
+            required=True
+        ),
+    ]
+)
 async def announce(ctx, title): #Set event status
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
@@ -191,7 +342,7 @@ async def help(ctx): #HELP MSG
             )
         embed.set_footer(text="The bot is now linked in with discord slash commands, simply type: / to get started.")
         embed.add_field(name = "<:add:850825248507953172> create", value = "Announces a new event", inline = False)
-        embed.add_field(name = "<:edit:850825297301209108> edit", value = "Edits an already existing event's information'", inline = False)
+        embed.add_field(name = "<:edit:850825297301209108> edit", value = "Edits an already existing event's information", inline = False)
         embed.add_field(name = "<:announce:850827849153642547> announce", value = "Pings an announcement for a new event", inline = False)
         embed.add_field(name = "<:query:850920584081571880> query", value = "Will query who has reacted to an event", inline = False)
         embed.add_field(name = "<:help:850783040174030869> help", value = "Lists all commands available, depending on the author's permissions", inline = False)
@@ -208,7 +359,19 @@ async def help(ctx): #HELP MSG
 
         await ctx.send(embed = embed, hidden=True)
 
-@slash.slash(name="query", description="Will query who has reacted in #events", guild_ids=guild_id)
+@slash.slash(
+    name="query",
+    description="Will query who has reacted to an event",
+    guild_ids=guild_id,
+    options=[
+        create_option(
+            name="message_id",
+            description="Provide the ID of the event message you want to query",
+            option_type=3,
+            required=True
+        )
+    ]
+)
 async def query(ctx, id): #TEST EMBED
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
