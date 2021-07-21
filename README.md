@@ -30,7 +30,7 @@ First thing first, let's get a Discord bot up and running for your server.
 
 ### 3. Finishing up
 
-Now your bot's in the server, there's a few more setup you need to do before you can run your bot.
+Although the bot's added, there's some final setup required before we're ready.
 
 1. Head into your Discord settings, scroll down until you see the **Advanced** tab and click it
 2. Enable **Developer Mode** and exit the settings
