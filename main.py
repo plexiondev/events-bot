@@ -59,14 +59,14 @@ async def help(ctx): #Message indicating the switch to /slash commands
         ),
         create_option(
             name="players",
-            description="Specify the maximum amount of players allowed",
-            option_type=4,
+            description="Specify the maximum amount of players allowed (or put No limit)",
+            option_type=3,
             required=True
         ),
         create_option(
             name="teams",
             description="Specify the amount of teams there will be (or put Solos)",
-            option_type=4,
+            option_type=3,
             required=True
         ),
         create_option(
@@ -189,14 +189,14 @@ async def create(ctx, title, description, players, teams, location, date, status
         ),
         create_option(
             name="players",
-            description="Specify the maximum amount of players allowed",
-            option_type=4,
+            description="Specify the maximum amount of players allowed (or put No limit)",
+            option_type=3,
             required=True
         ),
         create_option(
             name="teams",
             description="Specify the amount of teams there will be (or put Solos)",
-            option_type=4,
+            option_type=3,
             required=True
         ),
         create_option(
