@@ -1,6 +1,8 @@
 # Events Bot for Discord
 A bot that allows you to easily manage and announce events for you and your friends, built right into Discord.
 
+If you've installed the datapack, have a read through [the wiki](https://github.com/plexiondev/events-bot/wiki) for information on all available commands.
+
 ## How to install
 Unfortunately at the moment I cannot provide a 24/7 web-hosted version of the bot for you to add to your server. Right now, you need to self-host the bot for your guilds.
 
