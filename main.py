@@ -6,7 +6,8 @@ import random
 import csv
 
 from discord_slash.utils.manage_commands import create_choice, create_option
-bot = commands.Bot(command_prefix="!")
+activity = discord.Activity(type=discord.ActivityType.listening, name="plexion.dev")
+bot = commands.Bot(command_prefix="!", activity=activity)
 slash = SlashCommand(bot, sync_commands=True)
 bot.remove_command("help")
 
@@ -59,19 +60,13 @@ async def help(ctx): #Message indicating the switch to /slash commands
         ),
         create_option(
             name="players",
-            description="Specify the maximum amount of players allowed (or put No limit)",
-            option_type=3,
-            required=True
-        ),
-        create_option(
-            name="teams",
-            description="Specify the amount of teams there will be (or put Solos)",
+            description="Specify if there's a maximum player limit or unlimited",
             option_type=3,
             required=True
         ),
         create_option(
             name="location",
-            description="Specify where the event will be hosted (eg. ip, realm etc.)",
+            description="Specify where the event will be hosted",
             option_type=3,
             required=True
         ),
@@ -83,7 +78,7 @@ async def help(ctx): #Message indicating the switch to /slash commands
         ),
         create_option(
             name="status",
-            description="Specify the current status of the event, can be edited later",
+            description="Specify the current status of the event",
             option_type=3,
             required=True,
             choices=[
@@ -100,14 +95,30 @@ async def help(ctx): #Message indicating the switch to /slash commands
                     value="progress"
                 ),
                 create_choice(
-                    name="Cancelled/Ended",
+                    name="Cancelled",
+                    value="cancelled"
+                ),
+                create_choice(
+                    name="Ended",
                     value="ended"
                 )
             ]
+        ),
+        create_option(
+            name="teams",
+            description="Specify if there will be teams or just solos",
+            option_type=3,
+            required=False
+        ),
+        create_option(
+            name="version",
+            description="Is a specific game version required?",
+            option_type=3,
+            required=False
         )
     ]
 )
-async def create(ctx, title, description, players, teams, location, date, status): #Custom-defined embed
+async def create(ctx, title, description, status, players, location, date, teams=None, version=None): #Custom-defined embed
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
         try:
@@ -117,32 +128,42 @@ async def create(ctx, title, description, players, teams, location, date, status
                     description = (description),
                     colour = 0x76f755
                 )
-                embed.set_footer(text="Status: Ready to start  •  React below to either join the player list or the reserves/unsure list")
+                embed.set_footer(text="Ready to start!  •  React to join / if you're unsure on anything")
             elif status == "2" or status == "waiting":
                 embed = discord.Embed(
                     title = (title),
                     description = (description),
                     colour = 0x7581ef
                 )
-                embed.set_footer(text="Status: Waiting for players  •  React below to either join the player list or the reserves/unsure list")
+                embed.set_footer(text="Waiting for some players •  React to join / if you're unsure on anything")
             elif status == "3" or status == "progress":
                 embed = discord.Embed(
                     title = (title),
                     description = (description),
                     colour = 0xefda9a
                 )
-                embed.set_footer(text="Status: Event is being developed and tested  •  React below to either join the player list or the reserves/unsure list")
+                embed.set_footer(text="Being actively developed & tested  •  React to join / if you're unsure on anything")
+            elif status == "4" or status == "cancelled":
+                embed = discord.Embed(
+                    title = (title),
+                    description = (description),
+                    colour = 0xed5956
+                )
+                embed.set_footer(text="Event cancelled")
             else:
                 embed = discord.Embed(
                     title = (title),
                     description = (description),
                     colour = 0xed5956
                 )
-                embed.set_footer(text="Status: Event has finished, thanks for joining!")
-            embed.add_field(name = "<:players:850780580899848243> Players", value = (players), inline = True)
-            embed.add_field(name = "<:teams:850780581050449990> Teams", value = (teams), inline = True)
-            embed.add_field(name = "<:location:850780581092655144> Location", value = (location), inline = True)
-            embed.add_field(name = "<:date:850780581083873280> Date", value = (date), inline = True)
+                embed.set_footer(text="Event has finished, thanks for joining!")
+            embed.add_field(name = f"<:players:850780580899848243> Players", value = players, inline = True)
+            if teams != None:
+                embed.add_field(name = "<:teams:850780581050449990> Teams", value = teams, inline = True)
+            embed.add_field(name = "<:location:850780581092655144> Location", value = location, inline = True)
+            embed.add_field(name = "<:date:850780581083873280> Date", value = date, inline = True)
+            if version != None:
+                embed.add_field(name = "<:version:885917498178953266> Version", value = version, inline = True)
 
             channel = bot.get_channel(events)
             message = await channel.send(embed = embed)
@@ -189,19 +210,13 @@ async def create(ctx, title, description, players, teams, location, date, status
         ),
         create_option(
             name="players",
-            description="Specify the maximum amount of players allowed (or put No limit)",
-            option_type=3,
-            required=True
-        ),
-        create_option(
-            name="teams",
-            description="Specify the amount of teams there will be (or put Solos)",
+            description="Specify if there's a maximum player limit or unlimited",
             option_type=3,
             required=True
         ),
         create_option(
             name="location",
-            description="Specify where the event will be hosted (eg. ip, realm etc.)",
+            description="Specify where the event will be hosted",
             option_type=3,
             required=True
         ),
@@ -230,20 +245,36 @@ async def create(ctx, title, description, players, teams, location, date, status
                     value="progress"
                 ),
                 create_choice(
-                    name="Cancelled/Ended",
+                    name="Cancelled",
+                    value="cancelled"
+                ),
+                create_choice(
+                    name="Ended",
                     value="ended"
                 )
             ]
         ),
         create_option(
-            name="message_id",
-            description="Provide the ID of the event message you want to edit",
+            name="teams",
+            description="Specify if there will be teams or just solos",
             option_type=3,
-            required=True
+            required=False
+        ),
+        create_option(
+            name="version",
+            description="Is a specific game version required?",
+            option_type=3,
+            required=False
+        ),
+        create_option(
+            name="message_id",
+            description="Provide the message ID (leave blank to grab the latest message)",
+            option_type=3,
+            required=False
         )
     ]
 )
-async def edit(ctx, title, description, players, teams, location, date, status, id): #Set event status
+async def edit(ctx, title, description, status, players, location, date, teams=None, version=None, message_id=None): #Set event status
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
         if status == "1" or status == "ready":
@@ -252,35 +283,48 @@ async def edit(ctx, title, description, players, teams, location, date, status, 
                     description = (description),
                     colour = 0x76f755
                 )
-                embed.set_footer(text="Status: Ready to start  •  React below to either join the player list or the reserves/unsure list")
+                embed.set_footer(text="Ready to start!  •  React to join / if you're unsure on anything")
         elif status == "2" or status == "waiting":
             embed = discord.Embed(
                 title = (title),
                 description = (description),
                 colour = 0x7581ef
             )
-            embed.set_footer(text="Status: Waiting for players  •  React below to either join the player list or the reserves/unsure list")
+            embed.set_footer(text="Waiting for some players •  React to join / if you're unsure on anything")
         elif status == "3" or status == "progress":
             embed = discord.Embed(
                 title = (title),
                 description = (description),
                 colour = 0xefda9a
             )
-            embed.set_footer(text="Status: Event is being developed and tested  •  React below to either join the player list or the reserves/unsure list")
+            embed.set_footer(text="Being actively developed & tested  •  React to join / if you're unsure on anything")
+        elif status == "4" or status == "cancelled":
+            embed = discord.Embed(
+                title = (title),
+                description = (description),
+                colour = 0xed5956
+            )
+            embed.set_footer(text="Event cancelled")
         else:
             embed = discord.Embed(
                 title = (title),
                 description = (description),
                 colour = 0xed5956
             )
-            embed.set_footer(text="Status: Event has finished, thanks for joining!")
-        embed.add_field(name = "<:players:850780580899848243> Players", value = (players), inline = True)
-        embed.add_field(name = "<:teams:850780581050449990> Teams", value = (teams), inline = True)
-        embed.add_field(name = "<:location:850780581092655144> Location", value = (location), inline = True)
-        embed.add_field(name = "<:date:850780581083873280> Date", value = (date), inline = True)
+            embed.set_footer(text="Event has finished, thanks for joining!")
+        embed.add_field(name = f"<:players:850780580899848243> Players", value = players, inline = True)
+        if teams != None:
+            embed.add_field(name = "<:teams:850780581050449990> Teams", value = teams, inline = True)
+        embed.add_field(name = "<:location:850780581092655144> Location", value = location, inline = True)
+        embed.add_field(name = "<:date:850780581083873280> Date", value = date, inline = True)
+        if version != None:
+            embed.add_field(name = "<:version:885917498178953266> Version", value = version, inline = True)
 
         channel = bot.get_channel(events)
-        message = await channel.fetch_message(id)
+        if message_id == None:
+            message = await channel.fetch_message(channel.last_message_id)
+        else:
+            message = await channel.fetch_message(message_id)
 
         await message.edit(embed = embed)
 
@@ -340,7 +384,7 @@ async def help(ctx): #HELP MSG
             description = "Here is every command available to you, based on your permissions:",
             colour = 0x3359f2
             )
-        embed.set_footer(text="The bot is now linked in with discord slash commands, simply type: / to get started.")
+        embed.set_footer(text="The bot is now linked in with discord slash commands, simply type / to get started.")
         embed.add_field(name = "<:add:850825248507953172> create", value = "Announces a new event", inline = False)
         embed.add_field(name = "<:edit:850825297301209108> edit", value = "Edits an already existing event's information", inline = False)
         embed.add_field(name = "<:announce:850827849153642547> announce", value = "Pings an announcement for a new event", inline = False)
@@ -366,13 +410,13 @@ async def help(ctx): #HELP MSG
     options=[
         create_option(
             name="message_id",
-            description="Provide the ID of the event message you want to query",
+            description="Provide the message ID (leave blank to grab the latest message)",
             option_type=3,
-            required=True
+            required=False
         )
     ]
 )
-async def query(ctx, id): #TEST EMBED
+async def query(ctx, message_id=None): #TEST EMBED
     perms = ctx.author.permissions_in(ctx.channel)
     if perms.administrator:
         channel = bot.get_channel(events)
@@ -383,7 +427,10 @@ async def query(ctx, id): #TEST EMBED
             colour = 0x3359f2
             )
         embed.set_footer(text="This message is static and will need to be called again if anything changes.")
-        message = await channel.fetch_message(id)
+        if message_id == None:
+            message = await channel.fetch_message(channel.last_message_id)
+        else:
+            message = await channel.fetch_message(message_id)
         for reaction in message.reactions:
             users1 = []
             users2 = []
