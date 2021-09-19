@@ -45,9 +45,9 @@ Although the bot's added, there's some final setup required before we're ready.
 
 ### 4. Starting up
 
-Before you can actually run your bot, two additional dependencies will need to be installed: `discord` and `discord-py-slash-command`
+Before you can actually run your bot, two additional dependencies will need to be installed: `discord` and `discord-py-slash-command` Make sure you have Python 3+ installed before doing this step.
 
-On Windows, this can be installed with:
+On Windows, this can be installed by opening a **Command Prompt** `cmd` window and typing both:
 
 ```
 py -m pip install discord
@@ -56,6 +56,6 @@ py -m pip install discord
 py -m pip install discord-py-slash-command
 ```
 
-Now everything should be ready! Simply head into your bot folder and double click **main.py** (or open cmd and run main.py - to see when an error occurs and your bot closes - up to you)
+Now everything should be ready! Simply head into your bot folder and double click **main.py** (or open `cmd` and run `main.py` - to see when an error occurs and your bot closes - up to you)
 
 If you have any issues or questions, simply leave a Github issue in this repository. Anyways, have a good day!
